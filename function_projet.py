@@ -6,37 +6,38 @@
 def splitter(linetoparse):
     line=linetoparse.split(' ')
     get=linetoparse.split('"')
-    system_agent=' '.join(line[12:-1])#-1 pour enlever "/n"
+    usr_agent=get[5]
     
     #lireOS : pour identifier et afficher la version d'OS de la machine
-    def lireOS(system_agent) :
-        if "Windows" in system_agent :
-            OS="Windows"
+    def lireOS(usr_agent) :
+        if "Windows" in usr_agent :
+            sys_agent="Windows"
         
-        elif "Linux" in system_agent :
-            if "Android" in system_agent :
-                OS="Android"
+        elif "Linux" in usr_agent :
+            if "Android" in usr_agent :
+                sys_agent="Android"
             else :
-                OS="Linux"
+                sys_agent="Linux"
             
-        elif "Mac" in system_agent :
-            if "iPhone" in system_agent :
-                OS="iPhone OS"
+        elif "Mac" in usr_agent :
+            if "iPhone" in usr_agent :
+                sys_agent="iPhone OS"
             else :
-                OS="Mac OS"
+                sys_agent="Mac OS"
         else:
-            OS="OS unknown"
-        return OS
+            sys_agent="OS unknown"
+        return sys_agent
         
     list1=dict(
     time=line[3]+' '+line[4],
     remote_ip=line[0],
-    request=line[6],
+    request=get[1],
+    path=line[6],
     response=line[8],
     size=line[9],
-    href=get[3],
-    sys_agent=system_agent,
-    OS=lireOS(system_agent)
+    referrer=get[3],
+    user_agent=usr_agent,
+    system_agent=lireOS(usr_agent)
     )
 
     return list1

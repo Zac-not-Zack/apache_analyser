@@ -27,24 +27,23 @@ def splitter(line_to_parse):
     return list1
 
 #lireOS : pour identifier et afficher la version d'OS de la machine
-    def lire_OS(usr_agent) :
-        if "Windows" in usr_agent :
-            sys_agent="Windows"
+def lire_OS(usr_agent) :
+    if "Windows" in usr_agent :
+        sys_agent="Windows"
         
-        elif "Linux" in usr_agent :
-            if "Android" in usr_agent :
-                sys_agent="Android"
-            else :
-                sys_agent="Linux"
-            
-        elif "Mac" in usr_agent :
-            if "iPhone" in usr_agent :
-                sys_agent="iPhone OS"
-            else :
-                sys_agent="Mac OS"
-        else:
-            sys_agent="OS unknown"
-        return sys_agent
+    elif "Linux" in usr_agent :
+        if "Android" in usr_agent :
+            sys_agent="Android"
+        else :
+            sys_agent="Linux"            
+    elif "Mac" in usr_agent :
+        if "iPhone" in usr_agent :
+            sys_agent="iPhone OS"
+        else :
+            sys_agent="Mac OS"
+    else:
+        sys_agent="OS unknown"
+    return sys_agent
 
 #lireOS : pour identifier le navigateur de web
 def lire_browser(usr_agent) :
@@ -59,7 +58,7 @@ def lire_browser(usr_agent) :
     else:
         browser="Web browser unknown or bot"
     return browser
-    
+
 #lire_log : fonction pour parser un document entier en utilisant splitter   
 def lire_log (nom_fic) :
     f=open(nom_fic,"r")

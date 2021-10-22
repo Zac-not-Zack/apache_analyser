@@ -31,7 +31,21 @@ def splitter(linetoparse):
         else:
             sys_agent="OS unknown"
         return sys_agent
-        
+
+    def lireBrowser(usr_agent) :
+        if "Chrome" in usr_agent:
+            browser="Google Chrome"
+        elif "Safari" in usr_agent:
+            browser="Safari"
+        elif "MSIE" in usr_agent:
+            browser="MS Internet Explorer/Edge"
+        elif "Firefox" in usr_agent:
+            browser="Mozilla Firefox"
+        else:
+            browser="Web browser unknown or bot"
+        return browser
+            
+
     list1=dict(
     time=line[3]+' '+line[4],
     remote_ip=line[0],
@@ -42,16 +56,13 @@ def splitter(linetoparse):
     referrer=get[3],
     user_agent=usr_agent,
     system_agent=lireOS(usr_agent)
+    browser=lireBrowser(usr_agent)
     )
-
     return list1
 
-def cleaner(list1):
-    list1[0]=list1[1:]
-    list1[2]=list1[3].split('/')
-    #list1[6]=
 
-#print(splitter(test_line))
+
+
 
 #lireLog : fonction pour parser un document entier en utilisant splitter   
 def lireLog (nomFic) :

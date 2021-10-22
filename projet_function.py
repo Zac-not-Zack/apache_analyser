@@ -10,9 +10,23 @@ from datetime import date
 #splitter : seperate the texts in a line to retrieve the time, ip address, request, response code, packet size, referrer, system agent and browser 
 def splitter(line_to_parse):
     line=line_to_parse.split(' ')
-    get=line_to_parse.split("'")
+    get=line_to_parse.split('"')
     usr_agent=get[5]
-    #lireOS : pour identifier et afficher la version d'OS de la machine
+    list1=dict(
+        time=line[3]+' '+line[4],
+        remote_ip=line[0],
+        request=get[1],
+        path=line[6],
+        response=line[8],
+        size=line[9],
+        referrer=get[3],
+        user_agent=usr_agent,
+        system_agent=lire_OS(usr_agent),
+        browser=lire_browser(usr_agent)
+    )
+    return list1
+
+#lireOS : pour identifier et afficher la version d'OS de la machine
     def lire_OS(usr_agent) :
         if "Windows" in usr_agent :
             sys_agent="Windows"
@@ -31,32 +45,21 @@ def splitter(line_to_parse):
         else:
             sys_agent="OS unknown"
         return sys_agent
-    #lireOS : pour identifier le navigateur de web
-    def lire_browser(usr_agent) :
-        if "Chrome" in usr_agent:
-                browser="Google Chrome"
-        elif "Safari" in usr_agent:
-                browser="Safari"
-        elif "MSIE" in usr_agent:
-                browser="MS Internet Explorer/Edge"
-        elif "Firefox" in usr_agent:
-                browser="Mozilla Firefox"
-        else:
-                browser="Web browser unknown or bot"
-        return browser
-    list1=dict(
-        time=line[3]+' '+line[4],
-        remote_ip=line[0],
-        request=get[1],
-        path=line[6],
-        response=line[8],
-        size=line[9],
-        referrer=get[3],
-        user_agent=usr_agent,
-        system_agent=lire_OS(usr_agent),
-        browser=lire_browser(usr_agent)
-    )
-    return list1
+
+#lireOS : pour identifier le navigateur de web
+def lire_browser(usr_agent) :
+    if "Chrome" in usr_agent:
+        browser="Google Chrome"
+    elif "Safari" in usr_agent:
+        browser="Safari"
+    elif "MSIE" in usr_agent:
+        browser="MS Internet Explorer/Edge"
+    elif "Firefox" in usr_agent:
+        browser="Mozilla Firefox"
+    else:
+        browser="Web browser unknown or bot"
+    return browser
+    
 #lire_log : fonction pour parser un document entier en utilisant splitter   
 def lire_log (nom_fic) :
     f=open(nom_fic,"r")

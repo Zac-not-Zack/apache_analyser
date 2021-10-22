@@ -88,10 +88,10 @@ def count_OS(nom_fic_JSON) :
             result[data['system_agent']]=1
         else:
             result[data['system_agent']]=result[data['system_agent']]+1
-    string="Below are the number of users who used which operating system to access the server :\n"
-    # for os in result:
-    #     string=string+
-    return string
+    string="\nBelow are the number of users who used which operating system to access the server :\n\n"
+    for os in result:
+        string=string+"\t"+os+" : "+str(result[os])+'\n'
+    print(string)
             
 #give the average size of packet in byte for the total session   
 def average_size (nom_fic_JSON) :  
@@ -102,10 +102,11 @@ def average_size (nom_fic_JSON) :
         if data['size'] != '-' :
             size_float=float(data['size'])
             l_size.append(size_float)
-    avgsize=mean(l_size)   
-    return avgsize
+    avgsize=mean(l_size)
+    string="\nThe average size of packet for the whole log is : "+str(round(avgsize, 4)) 
+    print(string)
 
-#calculate the number of visitor for x day    
+#calculate the number of visitor for today    
 def trafic_du_jour (nom_fic_JSON) :
     with open(nom_fic_JSON,"r") as f :
         dict1=json.load(f)
@@ -114,9 +115,11 @@ def trafic_du_jour (nom_fic_JSON) :
     nb_visiteur=0
     for data in dict1 :
         date1=data['time'].split(':')
+        date1[0]=date1[0][1:]
         if date1[0]==d :
             nb_visiteur=nb_visiteur+1
-    return nb_visiteur
+    string="\nThe number of visitors that visit the server today is : "+str(nb_visiteur)
+    print(string)
     
 #HEAD,GET,POST,PUT,OTHERS
 #find peak hours, types of files?if same website?response
@@ -140,8 +143,11 @@ def count_method(nom_fic_JSON) :
         elif "PUT" in data['request'] :
             result["PUT"]=result["PUT"]+1
         else :
-            result["Others"]=result["Others"]+1    
-    return result
+            result["Others"]=result["Others"]+1  
+    string="\nBelow are frequencies of methods used with the server :\n\n"
+    for method in result:
+        string=string+"\t"+method+" : "+str(result[method])+'\n'
+    print(string)
 
 #find peak hours  
 def heure_creuse (nom_fic_JSON) :
@@ -152,9 +158,9 @@ def heure_creuse (nom_fic_JSON) :
     for data in dict1 :
         heure=data['time'].split(':')
         l_heure.append(heure[1])
-    heureCreuse=mode(l_heure)
-    #heureCreuse2=multimode(l_heure)
-    return heureCreuse #,heureCreuse2
+    heure_creuse=mode(l_heure)
+    string="\nThe time when most people are visiting the server : "+str(heure_creuse)+'00h'
+    print(string) 
 
 #count response code (eg. "200" : 100)   
 def count_response (nom_fic_JSON) :
@@ -164,7 +170,11 @@ def count_response (nom_fic_JSON) :
     for data in dict1 :
         l_rep.append(data['response'])
     result=Counter(l_rep)
-    return result
+    string="\nBelow are the frequencies of response code sent by the server to the visitors :\n\n"
+    for response in result:
+        string=string+'\t'+response+' : '+str(result[response])+'\n'
+    print(string)
+    
 
 #find 10 ip address that visited the server the most and users that visit only once   
 def analyse_IP_addr (nom_fic_JSON) :
@@ -181,8 +191,13 @@ def analyse_IP_addr (nom_fic_JSON) :
         if ip_addr2[ip_addr] == 1 :
             visiteur_unique=visiteur_unique+1
     result=dict(ip_addr1) #change to dictionary
-    result["Unique Visitor"]=visiteur_unique
-    return result
+    string="\nTop 10 visitors who visited the server with their frequencies :\n\n"
+    j=1
+    for ip in result:
+        string=string+'\t'+str(j)+'. '+ip+' : '+str(result[ip])+'\n'
+        j=j+1
+    string=string+'\nThe number of unique visitor : '+str(visiteur_unique)
+    print(string)
 
 #give the frequency of type of document (eg. "png" : 100)  
 def analyse_doc_type (nom_fic_JSON) :

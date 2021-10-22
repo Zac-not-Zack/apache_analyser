@@ -55,7 +55,7 @@ def splitter(linetoparse):
     size=line[9],
     referrer=get[3],
     user_agent=usr_agent,
-    system_agent=lireOS(usr_agent)
+    system_agent=lireOS(usr_agent),
     browser=lireBrowser(usr_agent)
     )
     return list1
@@ -159,4 +159,3 @@ def HeureCreuse (nomFicJSON) :
     #heureCreuse2=multimode(l_heure)
     return heureCreuse #,heureCreuse2
     
-def 

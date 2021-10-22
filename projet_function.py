@@ -13,16 +13,16 @@ def splitter(line_to_parse):
     get=line_to_parse.split("'")
     usr_agent=get[5]
     list1=dict(
-    time=line[3]+' '+line[4],
-    remote_ip=line[0],
-    request=get[1],
-    path=line[6],
-    response=line[8],
-    size=line[9],
-    referrer=get[3],
-    user_agent=usr_agent,
-    system_agent=lire_OS(usr_agent),
-    browser=lire_browser(usr_agent)
+        time=line[3]+' '+line[4],
+        remote_ip=line[0],
+        request=get[1],
+        path=line[6],
+        response=line[8],
+        size=line[9],
+        referrer=get[3],
+        user_agent=usr_agent,
+        system_agent=lire_OS(usr_agent),
+        browser=lire_browser(usr_agent)
     )
     return list1
 

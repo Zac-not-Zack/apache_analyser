@@ -12,22 +12,8 @@ def splitter(line_to_parse):
     line=line_to_parse.split(' ')
     get=line_to_parse.split("'")
     usr_agent=get[5]
-    list1=dict(
-    time=line[3]+' '+line[4],
-    remote_ip=line[0],
-    request=get[1],
-    path=line[6],
-    response=line[8],
-    size=line[9],
-    referrer=get[3],
-    user_agent=usr_agent,
-    system_agent=lire_OS(usr_agent),
-    browser=lire_browser(usr_agent)
-    )
-    return list1
-
-#lireOS : pour identifier et afficher la version d'OS de la machine
-def lire_OS(usr_agent) :
+    #lireOS : pour identifier et afficher la version d'OS de la machine
+    def lire_OS(usr_agent) :
         if "Windows" in usr_agent :
             sys_agent="Windows"
         
@@ -45,23 +31,32 @@ def lire_OS(usr_agent) :
         else:
             sys_agent="OS unknown"
         return sys_agent
-#lireOS : pour identifier le navigateur de web
-def lire_browser(usr_agent) :
-    if "Chrome" in usr_agent:
-            browser="Google Chrome"
-    elif "Safari" in usr_agent:
-            browser="Safari"
-    elif "MSIE" in usr_agent:
-            browser="MS Internet Explorer/Edge"
-    elif "Firefox" in usr_agent:
-            browser="Mozilla Firefox"
-    else:
-            browser="Web browser unknown or bot"
-    return browser
-
-
-
-
+    #lireOS : pour identifier le navigateur de web
+    def lire_browser(usr_agent) :
+        if "Chrome" in usr_agent:
+                browser="Google Chrome"
+        elif "Safari" in usr_agent:
+                browser="Safari"
+        elif "MSIE" in usr_agent:
+                browser="MS Internet Explorer/Edge"
+        elif "Firefox" in usr_agent:
+                browser="Mozilla Firefox"
+        else:
+                browser="Web browser unknown or bot"
+        return browser
+    list1=dict(
+        time=line[3]+' '+line[4],
+        remote_ip=line[0],
+        request=get[1],
+        path=line[6],
+        response=line[8],
+        size=line[9],
+        referrer=get[3],
+        user_agent=usr_agent,
+        system_agent=lire_OS(usr_agent),
+        browser=lire_browser(usr_agent)
+    )
+    return list1
 #lire_log : fonction pour parser un document entier en utilisant splitter   
 def lire_log (nom_fic) :
     f=open(nom_fic,"r")
@@ -91,7 +86,10 @@ def count_OS(nom_fic_JSON) :
             result[data['system_agent']]=1
         else:
             result[data['system_agent']]=result[data['system_agent']]+1
-    return result
+    string="Below are the number of users who used which operating system to access the server :\n"
+    # for os in result:
+    #     string=string+
+    return string
             
 #give the average size of packet in byte for the total session   
 def average_size (nom_fic_JSON) :  
@@ -120,23 +118,28 @@ def trafic_du_jour (nom_fic_JSON) :
     
 #HEAD,GET,POST,PUT,OTHERS
 #find peak hours, types of files?if same website?response
-# def count_method(nom_fic_JSON) :
-#     with open(nom_fic_JSON,"r") as f :
-#         dict1=json.load(f)
-    
-#     for data in dict1 :
-#         if "GET" in data['request'] :
-        
-#         elif "POST" in data['request'] :
-        
-#         elif "HEAD" in data['request'] :
-        
-#         elif "PUT" in data['request'] :
-        
-#         else :
-        
-            
-#     return result
+def count_method(nom_fic_JSON) :
+    with open(nom_fic_JSON,"r") as f :
+        dict1=json.load(f)
+    result={
+        "GET":0,
+        "POST":0,
+        "HEAD":0,
+        "PUT":0,
+        "Others":0
+    }
+    for data in dict1 :
+        if "GET" in data['request'] :
+            result["GET"]=result["GET"]+1
+        elif "POST" in data['request'] :
+            result["POST"]=result["POST"]+1
+        elif "HEAD" in data['request'] :
+            result["HEAD"]=result["HEAD"]+1
+        elif "PUT" in data['request'] :
+            result["PUT"]=result["PUT"]+1
+        else :
+            result["Others"]=result["Others"]+1    
+    return result
 
 #find peak hours  
 def heure_creuse (nom_fic_JSON) :

@@ -1,19 +1,32 @@
-#test_line="83.149.9.216 - - [17/May/2015:10:05:03 +0000] 'GET /presentations/logstash-monitorama-2013/images/kibana-search.png HTTP/1.1' 200 203023 'http://semicomplete.com/presentations/logstash-monitorama-2013/' 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1700.77 Safari/537.36'"
-
-#splitter : seperate the texts in a line to retrieve the time, ip address, request, response code, size, href, os
 import json
+import re
 from statistics import mean
 from statistics import mode
 from statistics import multimode
+from collections import Counter
 from datetime import date
-    
-def splitter(linetoparse):
-    line=linetoparse.split(' ')
-    get=linetoparse.split('"')
+
+ #splitter : seperate the texts in a line to retrieve the time, ip address, request, response code, packet size, referrer, system agent and browser 
+def splitter(line_to_parse):
+    line=line_to_parse.split(' ')
+    get=line_to_parse.split("'")
     usr_agent=get[5]
-    
-    #lireOS : pour identifier et afficher la version d'OS de la machine
-    def lireOS(usr_agent) :
+    list1=dict(
+    time=line[3]+' '+line[4],
+    remote_ip=line[0],
+    request=get[1],
+    path=line[6],
+    response=line[8],
+    size=line[9],
+    referrer=get[3],
+    user_agent=usr_agent,
+    system_agent=lire_OS(usr_agent),
+    browser=lire_browser(usr_agent)
+    )
+    return list1
+
+#lireOS : pour identifier et afficher la version d'OS de la machine
+def lire_OS(usr_agent) :
         if "Windows" in usr_agent :
             sys_agent="Windows"
         
@@ -31,81 +44,56 @@ def splitter(linetoparse):
         else:
             sys_agent="OS unknown"
         return sys_agent
-
-    def lireBrowser(usr_agent) :
-        if "Chrome" in usr_agent:
+#lireOS : pour identifier le navigateur de web
+def lire_browser(usr_agent) :
+    if "Chrome" in usr_agent:
             browser="Google Chrome"
-        elif "Safari" in usr_agent:
+    elif "Safari" in usr_agent:
             browser="Safari"
-        elif "MSIE" in usr_agent:
+    elif "MSIE" in usr_agent:
             browser="MS Internet Explorer/Edge"
-        elif "Firefox" in usr_agent:
+    elif "Firefox" in usr_agent:
             browser="Mozilla Firefox"
-        else:
+    else:
             browser="Web browser unknown or bot"
-        return browser
-            
-
-    list1=dict(
-    time=line[3]+' '+line[4],
-    remote_ip=line[0],
-    request=get[1],
-    path=line[6],
-    response=line[8],
-    size=line[9],
-    referrer=get[3],
-    user_agent=usr_agent,
-    system_agent=lireOS(usr_agent),
-    browser=lireBrowser(usr_agent)
-    )
-    return list1
-
+    return browser
 
 
 
 
 #lireLog : fonction pour parser un document entier en utilisant splitter   
-def lireLog (nomFic) :
-    f=open(nomFic,"r")
+def lire_log (nom_fic) :
+    f=open(nom_fic,"r")
     list2=[]
     for l in f:
         list2.append(splitter(l))
     return list2
     
-def convertJSON(nomFic) :
+def convert_JSON(nom_fic) :
     list2=[]
-    with open(nomFic,"r") as f :
-        nomFic2=nomFic[:-4]+".json"
+    with open(nom_fic,"r") as f :
+        nom_fic2=nom_fic[:-4]+".json"
         for l in f:
             list2.append(splitter(l))
-    with open(nomFic2,"w") as f2 :
+    with open(nom_fic2,"w") as f2 :
         json.dump(list2,f2,indent = 4)
     return list2
         
         
-def OSAnalyser(nomFicJSON) :
-    with open(nomFicJSON,"r") as f :
+def count_OS(nom_fic_JSON) :
+    with open(nom_fic_JSON,"r") as f :
         dict1=json.load(f)
-    compteurOS=[0,0,0,0,0,0]
-    for data in dict1 :
-        #print(data['system_agent'])
-        if data['system_agent'] == 'Windows' :
-            compteurOS[0]=compteurOS[0]+1
-        elif data['system_agent'] == 'Linux' :
-            compteurOS[1]=compteurOS[1]+1
-        elif data['system_agent'] == 'Android' :
-            compteurOS[2]=compteurOS[2]+1
-        elif data['system_agent'] == 'iPhone OS' :
-            compteurOS[3]=compteurOS[3]+1
-        elif data['system_agent'] == 'Mac OS' :
-            compteurOS[4]=compteurOS[4]+1
-        elif data['system_agent'] == 'OS unknown' :
-            compteurOS[5]=compteurOS[5]+1
+    result={}
+    for data in dict1:
+        if data['system_agent'] not in result:
+            result[data['system_agent']]=1
+        else:
+            result[data['system_agent']]=result[data['system_agent']]+1
+    return result
             
-    return compteurOS
     
-def AvgSize (nomFicJSON) :  
-    with open(nomFicJSON,"r") as f :
+def average_size (nom_fic_JSON) :  
+    with open(nom_fic_JSON,"r") as f :
         dict1=json.load(f)
     l_size=[]
     for data in dict1 :
@@ -115,40 +103,40 @@ def AvgSize (nomFicJSON) :
     avgsize=mean(l_size)   
     return avgsize
     
-def TraficduJour (nomFicJSON) :
-    with open(nomFicJSON,"r") as f :
+def trafic_du_jour (nom_fic_JSON) :
+    with open(nom_fic_JSON,"r") as f :
         dict1=json.load(f)
     today=date.today()
     d=today.strftime("%d/%B/%Y")
-    nbVisiteur=0
+    nb_visiteur=0
     for data in dict1 :
         date1=data['time'].split(':')
         if date1[0]==d :
-            nbVisiteur=nbVisiteur+1
-    return nbVisiteur
+            nb_visiteur=nb_visiteur+1
+    return nb_visiteur
     
 #HEAD,GET,POST,PUT,OTHERS
 #find peak hours, types of files?if same website?response
-def AnalyseMethode (nomFicJSON) :
-    with open(nomFicJSON,"r") as f :
-        dict1=json.load(f)
-    compteurMethode=[0,0,0,0,0]
-    for data in dict1 :
-        if "GET" in data['request'] :
-            compteurMethode[0]=compteurMethode[0]+1
-        elif "POST" in data['request'] :
-            compteurMethode[1]=compteurMethode[1]+1
-        elif "HEAD" in data['request'] :
-            compteurMethode[2]=compteurMethode[2]+1
-        elif "PUT" in data['request'] :
-            compteurMethode[3]=compteurMethode[3]+1
-        else :
-            compteurMethode[4]=compteurMethode[4]+1
+# def count_method(nom_fic_JSON) :
+#     with open(nom_fic_JSON,"r") as f :
+#         dict1=json.load(f)
+    
+#     for data in dict1 :
+#         if "GET" in data['request'] :
+        
+#         elif "POST" in data['request'] :
+        
+#         elif "HEAD" in data['request'] :
+        
+#         elif "PUT" in data['request'] :
+        
+#         else :
+        
             
-    return compteurMethode
+#     return result
   
-def HeureCreuse (nomFicJSON) :
-    with open(nomFicJSON,"r") as f :
+def heure_creuse (nom_fic_JSON) :
+    with open(nom_fic_JSON,"r") as f :
         dict1=json.load(f)
    
     l_heure=[]
@@ -159,3 +147,70 @@ def HeureCreuse (nomFicJSON) :
     #heureCreuse2=multimode(l_heure)
     return heureCreuse #,heureCreuse2
     
+def count_response (nom_fic_JSON) :
+    with open(nom_fic_JSON,"r") as f :
+        dict1=json.load(f)
+    l_rep=[]
+    for data in dict1 :
+        l_rep.append(data['response'])
+    result=Counter(l_rep)
+    return result
+    
+def analyse_IP_addr (nom_fic_JSON) :
+    with open(nom_fic_JSON,"r") as f :
+        dict1=json.load(f)
+    l_ipaddress=[]
+    for data in dict1 :
+        l_ipaddress.append(data['remote_ip'])
+    ip_addr1=Counter(l_ipaddress).most_common(10) #Les 10 clients le plus fréquentés
+    ip_addr2=Counter(l_ipaddress)
+    total_session=len(l_ipaddress)
+    visiteur_unique=0
+    for ip_addr in ip_addr2 : #pour calculer visiteur unique
+        if ip_addr2[ip_addr] == 1 :
+            visiteur_unique=visiteur_unique+1
+    result=dict(ip_addr1) #change to dictionary
+    result["Unique Visitor"]=visiteur_unique
+    return result
+    
+def analyse_doc_type (nom_fic_JSON) :
+    with open(nom_fic_JSON,"r") as f :
+        dict1=json.load(f)
+    l_typedoc=[]
+    unidentified_type=0
+    for data in dict1 :
+        if re.match("^.*[.].*$",data['path']) != None :
+            type_doc=data['path'].split('.')
+            if "?" in type_doc[1] :
+                type_doc1=type_doc[1].split('?')
+                l_typedoc.append(type_doc1[0])
+            else :
+                l_typedoc.append(type_doc[1])
+        else :
+            unidentified_type=unidentified_type+1
+    analyse_format=Counter(l_typedoc).most_common(10)
+    result=dict(analyse_format)
+    result["Unidentified Type"]=unidentified_type
+    return result
+
+#count browser
+def count_browser(nom_fic_JSON) :
+    with open(nom_fic_JSON,"r") as f :
+        dict1=json.load(f)
+    result={}
+    for data in dict1:
+        if data['browser'] not in result:
+            result[data['browser']]=1
+        else:
+            result[data['browser']]=result[data['browser']]+1
+    return result
+    
+#statistics in percentage
+def stat_percentage(nom_fic_JSON, count_function):
+    dict1=count_function(nom_fic_JSON)
+    total=0
+    for data in dict1:
+        total=total+dict1[data]
+    for data in dict1:
+        dict1[data]=str(round(dict1[data]/total,2))+'%'
+    return dict1   

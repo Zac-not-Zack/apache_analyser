@@ -245,7 +245,7 @@ my_parser.add_argument('--j', action='store_true', help="analyser le navigateur 
 
 
 args = my_parser.parse_args()
-print (args.dict1)
+
 nom_fic=args.filename.name
 nom_fic=nom_fic.split('.')
 nom_fic=nom_fic[0]+'.json'

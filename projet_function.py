@@ -28,39 +28,36 @@ def splitter(line_to_parse):
 
 #lireOS : pour identifier et afficher la version d'OS de la machine
 def lire_OS(usr_agent) :
-        if "Windows" in usr_agent :
-            sys_agent="Windows"
+    if "Windows" in usr_agent :
+        sys_agent="Windows"
         
-        elif "Linux" in usr_agent :
-            if "Android" in usr_agent :
-                sys_agent="Android"
-            else :
-                sys_agent="Linux"
-            
-        elif "Mac" in usr_agent :
-            if "iPhone" in usr_agent :
-                sys_agent="iPhone OS"
-            else :
-                sys_agent="Mac OS"
-        else:
-            sys_agent="OS unknown"
-        return sys_agent
+    elif "Linux" in usr_agent :
+        if "Android" in usr_agent :
+            sys_agent="Android"
+        else :
+            sys_agent="Linux"            
+    elif "Mac" in usr_agent :
+        if "iPhone" in usr_agent :
+            sys_agent="iPhone OS"
+        else :
+            sys_agent="Mac OS"
+    else:
+        sys_agent="OS unknown"
+    return sys_agent
+
 #lireOS : pour identifier le navigateur de web
 def lire_browser(usr_agent) :
     if "Chrome" in usr_agent:
-            browser="Google Chrome"
+        browser="Google Chrome"
     elif "Safari" in usr_agent:
-            browser="Safari"
+        browser="Safari"
     elif "MSIE" in usr_agent:
-            browser="MS Internet Explorer/Edge"
+        browser="MS Internet Explorer/Edge"
     elif "Firefox" in usr_agent:
-            browser="Mozilla Firefox"
+        browser="Mozilla Firefox"
     else:
-            browser="Web browser unknown or bot"
+        browser="Web browser unknown or bot"
     return browser
-
-
-
 
 #lire_log : fonction pour parser un document entier en utilisant splitter   
 def lire_log (nom_fic) :
@@ -91,8 +88,10 @@ def count_OS(nom_fic_JSON) :
             result[data['system_agent']]=1
         else:
             result[data['system_agent']]=result[data['system_agent']]+1
-
-    return result
+    string="\nBelow are the number of users who used which operating system to access the server :\n\n"
+    for os in result:
+        string=string+"\t"+os+" : "+str(result[os])+'\n'
+    print(string)
             
 #give the average size of packet in byte for the total session   
 def average_size (nom_fic_JSON) :  
@@ -103,10 +102,11 @@ def average_size (nom_fic_JSON) :
         if data['size'] != '-' :
             size_float=float(data['size'])
             l_size.append(size_float)
-    avgsize=mean(l_size)   
-    return avgsize
+    avgsize=mean(l_size)
+    string="\nThe average size of packet for the whole log is : "+str(round(avgsize, 4)) 
+    print(string)
 
-#calculate the number of visitor for x day    
+#calculate the number of visitor for today    
 def trafic_du_jour (nom_fic_JSON) :
     with open(nom_fic_JSON,"r") as f :
         dict1=json.load(f)
@@ -115,29 +115,39 @@ def trafic_du_jour (nom_fic_JSON) :
     nb_visiteur=0
     for data in dict1 :
         date1=data['time'].split(':')
+        date1[0]=date1[0][1:]
         if date1[0]==d :
             nb_visiteur=nb_visiteur+1
-    return nb_visiteur
+    string="\nThe number of visitors that visit the server today is : "+str(nb_visiteur)
+    print(string)
     
 #HEAD,GET,POST,PUT,OTHERS
 #find peak hours, types of files?if same website?response
-# def count_method(nom_fic_JSON) :
-#     with open(nom_fic_JSON,"r") as f :
-#         dict1=json.load(f)
-    
-#     for data in dict1 :
-#         if "GET" in data['request'] :
-        
-#         elif "POST" in data['request'] :
-        
-#         elif "HEAD" in data['request'] :
-        
-#         elif "PUT" in data['request'] :
-        
-#         else :
-        
-            
-#     return result
+def count_method(nom_fic_JSON) :
+    with open(nom_fic_JSON,"r") as f :
+        dict1=json.load(f)
+    result={
+        "GET":0,
+        "POST":0,
+        "HEAD":0,
+        "PUT":0,
+        "Others":0
+    }
+    for data in dict1 :
+        if "GET" in data['request'] :
+            result["GET"]=result["GET"]+1
+        elif "POST" in data['request'] :
+            result["POST"]=result["POST"]+1
+        elif "HEAD" in data['request'] :
+            result["HEAD"]=result["HEAD"]+1
+        elif "PUT" in data['request'] :
+            result["PUT"]=result["PUT"]+1
+        else :
+            result["Others"]=result["Others"]+1  
+    string="\nBelow are frequencies of methods used with the server :\n\n"
+    for method in result:
+        string=string+"\t"+method+" : "+str(result[method])+'\n'
+    print(string)
 
 #find peak hours  
 def heure_creuse (nom_fic_JSON) :
@@ -148,9 +158,9 @@ def heure_creuse (nom_fic_JSON) :
     for data in dict1 :
         heure=data['time'].split(':')
         l_heure.append(heure[1])
-    heureCreuse=mode(l_heure)
-    #heureCreuse2=multimode(l_heure)
-    return heureCreuse #,heureCreuse2
+    heure_creuse=mode(l_heure)
+    string="\nThe time when most people are visiting the server : "+str(heure_creuse)+'00h'
+    print(string) 
 
 #count response code (eg. "200" : 100)   
 def count_response (nom_fic_JSON) :
@@ -160,7 +170,11 @@ def count_response (nom_fic_JSON) :
     for data in dict1 :
         l_rep.append(data['response'])
     result=Counter(l_rep)
-    return result
+    string="\nBelow are the frequencies of response code sent by the server to the visitors :\n\n"
+    for response in result:
+        string=string+'\t'+response+' : '+str(result[response])+'\n'
+    print(string)
+    
 
 #find 10 ip address that visited the server the most and users that visit only once   
 def analyse_IP_addr (nom_fic_JSON) :
@@ -177,8 +191,13 @@ def analyse_IP_addr (nom_fic_JSON) :
         if ip_addr2[ip_addr] == 1 :
             visiteur_unique=visiteur_unique+1
     result=dict(ip_addr1) #change to dictionary
-    result["Unique Visitor"]=visiteur_unique
-    return result
+    string="\nTop 10 visitors who visited the server with their frequencies :\n\n"
+    j=1
+    for ip in result:
+        string=string+'\t'+str(j)+'. '+ip+' : '+str(result[ip])+'\n'
+        j=j+1
+    string=string+'\nThe number of unique visitor : '+str(visiteur_unique)
+    print(string)
 
 #give the frequency of type of document (eg. "png" : 100)  
 def analyse_doc_type (nom_fic_JSON) :
@@ -222,73 +241,3 @@ def stat_percentage(nom_fic_JSON, count_function):
     for data in dict1:
         dict1[data]=str(round(dict1[data]/total,2))+'%'
     return dict1   
-
-#CLI
-#nomFic=input('Nom de fichier log que vous souhaitez analyser : ')
-my_parser = argparse.ArgumentParser(description="Analyser fichier log au format apache. Attention : il faut impérativement convertir le fichier log en format json (avec l'option --a) pour pouvoir l'utiliser ")
-
-#help='Il faut impérativement convertir le fichier log en json pour pouvoir utiliser')
-
-my_parser.add_argument('filename', type=argparse.FileType('r'),)
-my_parser.add_argument('dict1', nargs='?',type=json.loads)
-my_parser.add_argument('--a', action='store_true', help='changer le fichier en format JSON')#convertJSON
-my_parser.add_argument('--b', action='store_true', help="analyser l'OS d'utilisateur" )#OSAnalyser
-my_parser.add_argument('--c', action='store_true', help="calculer la taille moyenne de paquets demandés" )#AvgSize
-my_parser.add_argument('--d', action='store_true', help="voir le trafic du jour sur le serveur" )#TraficduJour
-my_parser.add_argument('--e', action='store_true', help="analyser la méthode de requête solicitée" )#AnalyseMethode
-my_parser.add_argument('--f', action='store_true', help="voir l'heure creuse du serveur et le trafic en fonction d'heure" )#HeureCreuse
-my_parser.add_argument('--g', action='store_true', help="analyser les réponses des requêtes" )#AnalyseResponse
-my_parser.add_argument('--h', action='store_true', help="analyser les adresses IP de clients" )#AnalyseIPAdd
-my_parser.add_argument('--i', action='store_true', help="analyser les 10 types de documents les plus demandés par client" )#AnalyseTypeDoc
-my_parser.add_argument('--j', action='store_true', help="analyser le navigateur utilisé par client" )#AnalyseBrowser
-
-
-
-args = my_parser.parse_args()
-print (args.dict1)
-nom_fic=args.filename.name
-nom_fic=nom_fic.split('.')
-nom_fic=nom_fic[0]+'.json'
-#print(nom_fic)
-if args.a:
-    convert_JSON(args.filename.name)
-#print(args.a)
-#print(args.filename.name)
-
-
-if args.b:
-    resultat_OS=count_OS(nom_fic)
-    print(resultat_OS)
-    
-if args.c:
-    resultat_avg=average_size(nom_fic)
-    print(resultat_avg)
-    
-if args.d:
-    resultat_trafic=trafic_du_jour(nom_fic)
-    print(resultat_trafic)
-    
-if args.e:
-    resultat_methode=count_method(nom_fic)
-    print(resultat_methode)
-    
-if args.f:
-    resultat_heure_creuse=heure_creuse(nom_fic)
-    print(resultat_heure_creuse)
-    
-if args.g:
-    resultat_reponse=count_response(nom_fic)
-    print(resultat_reponse)
-    
-if args.h:
-    resultat_IP=analyse_IP_addr(nom_fic)
-    print(resultat_IP)
-    
-if args.i:
-    resultat_type_doc=analyse_doc_type(nom_fic)
-    print(resultat_type_doc)
-    
-if args.j:
-    resultat_count_browser=count_browser(nom_fic)
-    print(resultat_count_browser)
-    

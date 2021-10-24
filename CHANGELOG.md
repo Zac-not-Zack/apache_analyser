@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [[0.8.0]](https://github.com/Zac-not-Zack/Projet-Python/commit/61878071f60db918c55c43c9c207b2bb3bdbb6ab) - 2021-10-24
+## [[0.8.0]](https://github.com/Zac-not-Zack/apache_analyser/commit/61878071f60db918c55c43c9c207b2bb3bdbb6ab) - 2021-10-24
 ### Added
 - A complete CHANGELOG.md file is added
 

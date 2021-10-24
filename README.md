@@ -31,7 +31,7 @@ In the version 1.0.0 of this module, it contains a total of 10 functions that ar
   apache_analyser.py path/to/your/log/file --b
   ```
   
-  - ### 3. average_os (option --c)
+  - ### 3. average_size (option --c)
      It helps to calculate the average size of objects requested by clients. On top of that, it also provides the maximum and minimum size of objects requested. This allow us  to anticipate the traffic on the server, adapt the contains and adapt the bandwidth of the network according to the calculation.
   ```ruby
   apache_analyser.py path/to/your/log/file --c

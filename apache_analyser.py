@@ -1,3 +1,5 @@
+
+# !/usr/bin/python3 
 import json
 import re
 import argparse
@@ -5,6 +7,8 @@ from statistics import mean
 from statistics import mode
 from collections import Counter
 from datetime import date
+from tkinter import *
+
 
 # splitter :separer les textes dans une ligne afin de recuperer the time,
 # ip address, request, response code, packet size, referrer,
@@ -94,6 +98,7 @@ def count_os(nom_fic_json):
     for os in result:
         string=string+"\t"+os+" : "+str(result[os])+'\n'
     string = string+stat_percentage(result)
+    bar_graph(result) #afficher un graphe à barres
     return string
 
 # average_size : donne la taille moyenne des paquets pour un enregistrement apache
@@ -129,7 +134,7 @@ def trafic_du_jour(nom_fic_json):
     return string
 
 # count_method : compter le nombre de méthode utilisée par le monde pour acceder le serveur
-# afficher le nombre, le pourcentage et un diagramme circulaire
+# afficher le nombre, le pourcentage et un graphe à barres
 def count_method(nom_fic_json):
     with open(nom_fic_json, "r") as f:
         dict1 = json.load(f)
@@ -155,6 +160,7 @@ def count_method(nom_fic_json):
     for method in result:
         string = string+"\t"+method+" : "+str(result[method])+'\n'
     string = string+stat_percentage(result)
+    pie_chart(result)
     return string
 
 # heure_creuse : trouver l'heure creuse
@@ -183,6 +189,7 @@ def count_response(nom_fic_json):
     for response in result:
         string = string+'\t'+response+' : '+str(result[response])+'\n'
     string = string+"\nAttention : L'apparition répétitive de code d'état de famille 4xx et 5xx (403, 500, 503 etc.) peuvent potentiellement impliquer une faille de sécurité\n"+stat_percentage(result)
+    pie_chart(result)
     return string
 
 # analyse_ip_addr : trouver 10 adresse ip qui visite le serveur le plus avec la fréquence et le nombre de visiteur unique
@@ -251,21 +258,77 @@ def count_browser(nom_fic_json):
     for browser in result:
         string = string+"\t"+browser+" : "+str(result[browser])+"\n"
     string = string+stat_percentage(result)
+    pie_chart(result)
     return string
 
 # stat_percentage : Les données en pourcentage
 def stat_percentage(dict1):
+
     total = 0
     string = ""
     for data in dict1:
         total = total+dict1[data]
     for data in dict1:
-        dict1[data] = str((round((dict1[data]/total)*100,2)))+"%"
+        dict1[data] = str((round((dict1[data]/total)*100, 2)))+"%"
     string = string+'\nLes données en pourcentage :\n\n'
     for data in dict1:
         string = string+"\t"+data+" : "+dict1[data]+"\n"
     return string
 
+#graphique en utilisant tkinter
+#pie_chart : create a pie chart from a dictionary which contains a percentage as a string
+def pie_chart(dict1):
+    root = Tk()
+    root.title("Diagramme Circulaire")
+    canvas = Canvas(root, width=400, height=400)
+    canvas.pack()
+    colour = ["Red", "Blue", "Green", "Yellow", "Pink", "Brown", "Orange", "Grey" ]
+    legend = ""
+    freq = []
+    i = 0 #counter for colour
+    j = 0 #counter for create_arc
+    angle = 0
+    for data in dict1: #create legend for the data according to their colour
+        legend = legend+colour[i]+" - "+data+" : "+dict1[data]+"\n"
+        i = i+1
+    for data in dict1:
+        dict1[data] = float(dict1[data][:-1]) #somehow our dictionary returns a percentage as a string, even if we stocked the value in a temporary varibale, so we need to change it back to interger
+        dict1[data] = round((dict1[data]/100)*360)
+        freq.append(dict1[data])
+    Label(root, text=legend, justify="left").place(x=2, y=2)
+    for data in dict1:
+        canvas.create_arc(110, 110, 310, 310, fill=colour[j], start=angle, extent=freq[j])
+        angle = angle+freq[j]
+        j = j+1
+    root.mainloop()
+    
+#bar_graph : create a bar graph from a dictionary which contains a percentage as a string  
+def bar_graph(dict1):
+    root = Tk()
+    root.title("Graphique à Barres")
+    canvas = Canvas(root, width=600, height=600)
+    canvas.pack()
+    i = 0
+    j = 0
+    x_start = 50
+    legend = ""
+    colour = ["Red", "Blue", "Green", "Yellow", "Pink", "Brown", "Orange", "Grey" ]
+    for data in dict1: #create legend for the data according to their colour
+        legend = legend+colour[i]+" - "+data+" : "+dict1[data]+"\n"
+        i = i+1
+    Label(root, text=legend, justify="left").place(x=2, y=2)
+    for data in dict1:
+        dict1[data] = float(dict1[data][:-1])
+    
+    canvas.create_line(20, 500, 580, 500)
+    for data in dict1:
+        y_end = 500-(dict1[data]*5)
+        canvas.create_rectangle(x_start, 500, x_start+70, y_end, fill=colour[j])
+        Label(root, text=data).place(x=x_start+7, y=507)
+        Label(root, text=str(dict1[data])+"%").place(x=x_start+20, y=y_end-25)
+        x_start = x_start+80
+        j = j+1
+    root.mainloop()
 
 
 # CLI

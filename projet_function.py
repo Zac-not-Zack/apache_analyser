@@ -6,7 +6,7 @@ from statistics import mode
 from collections import Counter
 from datetime import date
 
-# Splitter : seperate the texts in a line to retrieve the time,
+# splitter :separer les textes dans une ligne afin de recuperer the time,
 # ip address, request, response code, packet size, referrer,
 # system agent and browser
 def splitter(line_to_parse):
@@ -27,7 +27,7 @@ def splitter(line_to_parse):
     )
     return list1
 
-# LireOS : pour identifier et afficher la version d'OS de la machine
+# lire_os : pour identifier et afficher la version d'OS de la machine
 def lire_os(usr_agent):
     if "Windows" in usr_agent:
         sys_agent = "Windows"
@@ -45,7 +45,7 @@ def lire_os(usr_agent):
         sys_agent = "OS unknown"
     return sys_agent
 
-# LireOS : pour identifier le navigateur de web
+# lire_browser : pour identifier le navigateur de web
 def lire_browser(usr_agent):
     if "Chrome" in usr_agent:
         browser = "Google Chrome"
@@ -59,7 +59,7 @@ def lire_browser(usr_agent):
         browser = "Web browser unknown or bot"
     return browser
 
-# Lire_log : fonction pour parser un document entier
+# lire_log : fonction pour parser un document entier
 # en utilisant splitter
 def lire_log(nom_fic):
     f = open(nom_fic, "r")
@@ -68,7 +68,7 @@ def lire_log(nom_fic):
         list2.append(splitter(l))
     return list2
 
-# Convert an apache log to json
+# convert_JSON : convertir un apache log à json
 def convert_json(nom_fic):
     list2 = []
     with open(nom_fic, "r") as f:
@@ -79,7 +79,8 @@ def convert_json(nom_fic):
         json.dump(list2, f2, indent=4)
     return list2
 
-# Count number of users who uses x OS
+# count_OS : compter le nombre d'utilisateur qui utilise tel système d'exploitation pour acceder le serveur 
+# afiche le nombre, le pourcentage et un diagramme circulaire
 def count_os(nom_fic_json):
     with open(nom_fic_json, "r") as f:
         dict1 = json.load(f)
@@ -89,12 +90,13 @@ def count_os(nom_fic_json):
             result[data['system_agent']] = 1
         else:
             result[data['system_agent']] = result[data['system_agent']]+1
-    string = "\nBelow are the number of users who used which operating system to access the server :\n\n"
+    string="\nLe nombre d'utilisateur qui utilise tel système d'exploitation pour accéder au serveur :\n\n"
     for os in result:
-        string = string+"\t"+os+" : "+str(result[os])+'\n'
+        string=string+"\t"+os+" : "+str(result[os])+'\n'
+    string = string+stat_percentage(result)
     return string
 
-# Give the average size of packet in byte for the total session
+# average_size : donne la taille moyenne des paquets pour un enregistrement apache
 def average_size(nom_fic_json):
     with open(nom_fic_json, "r") as f:
         dict1 = json.load(f)
@@ -104,10 +106,14 @@ def average_size(nom_fic_json):
             size_float = float(data['size'])
             l_size.append(size_float)
     avgsize = mean(l_size)
-    string = "\nThe average size of packet for the whole log is : "+str(round(avgsize, 4))
+    maxsize = max(l_size)
+    minsize = min(l_size)
+    string = "\nLa taille moyenne de fichier demandé est égale à : "+str(round(avgsize, 4))+" octets"
+    string = string + "\nLa taille max de fichier demandé est égale à : "+str(maxsize)+" octets"
+    string = string + "\nLa taille min de fichier demandé est égale à : "+str(minsize)+" octets"
     return string
 
-# Calculate the number of visitor for today
+# trafic_du_jour : calculer le nombre total de visiteur à jour actuel
 def trafic_du_jour(nom_fic_json):
     with open(nom_fic_json, "r") as f:
         dict1 = json.load(f)
@@ -119,11 +125,11 @@ def trafic_du_jour(nom_fic_json):
         date1[0] = date1[0][1:]
         if date1[0] == d:
             nb_visiteur = nb_visiteur+1
-    string = "\nThe number of visitors that visit the server today is : "+str(nb_visiteur)
+    string = "\nLe nombre total de visiteur aujourd'hui : "+str(nb_visiteur)
     return string
 
-# HEAD,GET,POST,PUT,OTHERS
-# find peak hours, types of files?if same website?response
+# count_method : compter le nombre de méthode utilisée par le monde pour acceder le serveur
+# afficher le nombre, le pourcentage et un diagramme circulaire
 def count_method(nom_fic_json):
     with open(nom_fic_json, "r") as f:
         dict1 = json.load(f)
@@ -145,12 +151,13 @@ def count_method(nom_fic_json):
             result["PUT"] = result["PUT"]+1
         else:
             result["Others"] = result["Others"]+1
-    string = "\nBelow are frequencies of methods used with the server :\n\n"
+    string = "\nLe nombre de méthode utilisée pour acceder le serveur :\n\n"
     for method in result:
         string = string+"\t"+method+" : "+str(result[method])+'\n'
+    string = string+stat_percentage(result)
     return string
 
-# Find peak hours
+# heure_creuse : trouver l'heure creuse
 def heure_creuse(nom_fic_json):
     with open(nom_fic_json, "r") as f:
         dict1 = json.load(f)
@@ -159,10 +166,12 @@ def heure_creuse(nom_fic_json):
         heure = data['time'].split(':')
         l_heure.append(heure[1])
     heure_creuse = mode(l_heure)
-    string = "\nThe time when most people are visiting the server : "+str(heure_creuse)+'00h'
+    heure_creuse2 = int(heure_creuse) +1
+    string="\nL'heure où il y a le plus de trafic sur le serveur : "+heure_creuse+'h00 - '+str(heure_creuse2)+'h00'
     return string
 
-# Count response code (eg. "200" : 100)
+# count_response : compter le nombre de code de réponse
+# afficher le nombre (eg. "200" : 100), le pourcentage, et un diagramme circulaire
 def count_response(nom_fic_json):
     with open(nom_fic_json, "r") as f:
         dict1 = json.load(f)
@@ -170,13 +179,13 @@ def count_response(nom_fic_json):
     for data in dict1:
         l_rep.append(data['response'])
     result = Counter(l_rep)
-    string = "\nBelow are the frequencies of response code sent by the server to the visitors :\n\n"
+    string = "\nLe nombre de code HTTP :\n\n"
     for response in result:
         string = string+'\t'+response+' : '+str(result[response])+'\n'
+    string = string+"\nAttention : L'apparition répétitive de code d'état de famille 4xx et 5xx (403, 500, 503 etc.) peuvent potentiellement impliquer une faille de sécurité\n"+stat_percentage(result)
     return string
 
-# Find 10 ip address that visited the server the most and users
-# that visit only once
+# analyse_ip_addr : trouver 10 adresse ip qui visite le serveur le plus avec la fréquence et le nombre de visiteur unique
 def analyse_ip_addr(nom_fic_json):
     with open(nom_fic_json, "r") as f:
         dict1 = json.load(f)
@@ -187,19 +196,21 @@ def analyse_ip_addr(nom_fic_json):
     ip_addr2 = Counter(l_ipaddress)
     total_session = len(l_ipaddress)
     visiteur_unique = 0
-    for ip_addr in ip_addr2: #pour calculer visiteur unique
+    for ip_addr in ip_addr2 : #pour calculer visiteur unique
         if ip_addr2[ip_addr] == 1:
             visiteur_unique = visiteur_unique+1
     result = dict(ip_addr1) #change to dictionary
-    string = "\nTop 10 visitors who visited the server with their frequencies :\n\n"
-    j = 1
+    string = "\nLes 10 adresses IP dont la fréquence de visite est la plus élévée :\n\n"
+    placement = 1 #compteur pour placement
     for ip in result:
-        string = string+'\t'+str(j)+'. '+ip+' : '+str(result[ip])+'\n'
-        j = j+1
-    string = string+'\nThe number of unique visitor : '+str(visiteur_unique)
+        string = string+'\t'+str(placement)+'. '+ip+' : '+str(result[ip])+'\n'
+        placement = placement+1
+    string = string+'\nLe nombre de visiteur unique : '+str(visiteur_unique)
+    string = string+'\nLe nombre total de sessions : '+str(total_session)
     return string
 
-# Give the frequency of type of document (eg. "png" : 100)
+# analyse_doc_type : trouver 10 type des documents le plus demandés avec la fréquence et 
+# le nombre de session qui le type est non identifiable
 def analyse_doc_type(nom_fic_json):
     with open(nom_fic_json, "r") as f:
         dict1 = json.load(f)
@@ -216,11 +227,17 @@ def analyse_doc_type(nom_fic_json):
         else:
             unidentified_type = unidentified_type+1
     analyse_format = Counter(l_typedoc).most_common(10)
-    result = dict(analyse_format)
-    result["Unidentified Type"] = unidentified_type
-    return result
+    result = dict(analyse_format) #change to dictionary
+    string='\nLes 10 types de documents le plus demandé  :\n\n'
+    placement = 1
+    for doc in result:
+        string = string+'\t'+str(placement)+'. '+doc+' : '+str(result[doc])+'\n'
+        placement = placement+1
+    string = string+'\nLe nombre de session dont le type de document est non identifiable  : '+str(unidentified_type)
+    return string
 
-# Count browser
+# count_browser : compter le navigateur utilsé pour acceder le serveur // 
+# afficher le nombre, pourcentage et diagramme circulaire
 def count_browser(nom_fic_json):
     with open(nom_fic_json, "r") as f:
         dict1 = json.load(f)
@@ -230,27 +247,31 @@ def count_browser(nom_fic_json):
             result[data['browser']] = 1
         else:
             result[data['browser']] = result[data['browser']]+1
-    return result
+    string = '\nLes navigateurs utilisés pour acceder au serveur :\n\n'
+    for browser in result:
+        string = string+"\t"+browser+" : "+str(result[browser])+"\n"
+    string = string+stat_percentage(result)
+    return string
 
-# Statistics in percentage
-def stat_percentage(nom_fic_json, count_function):
-    dict1 = count_function(nom_fic_json)
+# stat_percentage : Les données en pourcentage
+def stat_percentage(dict1):
     total = 0
+    string = ""
     for data in dict1:
         total = total+dict1[data]
     for data in dict1:
-        dict1[data] = str(round(dict1[data]/total, 2))+'%'
-    return dict1
+        dict1[data] = str((round((dict1[data]/total)*100,2)))+"%"
+    string = string+'\nLes données en pourcentage :\n\n'
+    for data in dict1:
+        string = string+"\t"+data+" : "+dict1[data]+"\n"
+    return string
 
 
 
 # CLI
 # nomFic=input('Nom de fichier log que vous souhaitez analyser : ')
 my_parser = argparse.ArgumentParser(
-description="Analyser fichier log au format apache. Attention : il faut impérativement convertir le fichier log en format json (avec l'option --a) pour pouvoir l'utiliser ")
-
-# help='Il faut impérativement convertir le fichier log en
-# json pour pouvoir utiliser')
+description="Analyser fichier log au format apache. Attention : il faut impérativement convertir le fichier log en format json (avec l'option --a) pour pouvoir utiliser les autres options ")
 
 my_parser.add_argument('filename', type=argparse.FileType('r'),)
 my_parser.add_argument('dict1', nargs='?', type=json.loads)
@@ -332,4 +353,3 @@ if args.i:
 if args.j:
     resultat_count_browser = count_browser(nom_fic)
     print(resultat_count_browser)
-

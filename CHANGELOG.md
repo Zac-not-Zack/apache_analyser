@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [[0.8.0]](https://github.com/Zac-not-Zack/Projet-Python/commit/61878071f60db918c55c43c9c207b2bb3bdbb6ab) - 2021-10-24
+### Added
+- A complete CHANGELOG.md file is added
 
 ## [[0.7.0]](https://github.com/Zac-not-Zack/Projet-Python/commit/d6f995e8305eee78961d0dc955727df1ef0b686f) - 2021-10-23
 ### Added

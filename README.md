@@ -13,7 +13,7 @@ Our targetted audience is the mainly the user of Apache server, specifically the
 The package of the project will be available on PyPi soon after the complete structuring and validation. Stay tuned!
 
 # :pencil: Usage
-In the version 1.0.0 of this module, it contains a total of 10 functions that are conceived to facilitate the analyse of a running Apache server. Thanks to our CLI you can choose whichever functions that you wish. 
+In the version 1.0.0 of this module, it contains a total of 10 functions that are conceived to facilitate the analysis of a running Apache server. Thanks to our CLI you can choose whichever functions that you wish. 
 
 **Note : You will have to use "option --a" when running the code for the first time to convert the file into the format of JSON**
   

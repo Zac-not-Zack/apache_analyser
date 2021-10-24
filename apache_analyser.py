@@ -1,3 +1,4 @@
+
 # !/usr/bin/python3 
 import json
 import re
@@ -6,8 +7,8 @@ from statistics import mean
 from statistics import mode
 from collections import Counter
 from datetime import date
-from projet_graphique import *
 from tkinter import *
+
 
 # splitter :separer les textes dans une ligne afin de recuperer the time,
 # ip address, request, response code, packet size, referrer,
@@ -92,15 +93,12 @@ def count_os(nom_fic_json):
         if data['system_agent'] not in result:
             result[data['system_agent']] = 1
         else:
-            result[data['system_agent']] = result[data['system_agent']]+1 
-    
+            result[data['system_agent']] = result[data['system_agent']]+1
     string="\nLe nombre d'utilisateur qui utilise tel système d'exploitation pour accéder au serveur :\n\n"
     for os in result:
         string=string+"\t"+os+" : "+str(result[os])+'\n'
     string = string+stat_percentage(result)
-    
-    bar_graph(result)
-    
+    bar_graph(result) #afficher un graphe à barres
     return string
 
 # average_size : donne la taille moyenne des paquets pour un enregistrement apache
@@ -265,16 +263,16 @@ def count_browser(nom_fic_json):
 
 # stat_percentage : Les données en pourcentage
 def stat_percentage(dict1):
-    totale = 0
+
+    total = 0
     string = ""
-    temp1 = dict1
     for data in dict1:
-        totale = totale+dict1[data]
+        total = total+dict1[data]
     for data in dict1:
-        temp1[data] = str((round((temp1[data]/totale)*100,2)))+"%"
+        dict1[data] = str((round((dict1[data]/total)*100, 2)))+"%"
     string = string+'\nLes données en pourcentage :\n\n'
-    for data in temp1:
-        string = string+"\t"+data+" : "+temp1[data]+"\n"
+    for data in dict1:
+        string = string+"\t"+data+" : "+dict1[data]+"\n"
     return string
 
 #graphique en utilisant tkinter
@@ -331,7 +329,6 @@ def bar_graph(dict1):
         x_start = x_start+80
         j = j+1
     root.mainloop()
-
 
 
 # CLI

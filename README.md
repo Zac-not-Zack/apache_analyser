@@ -106,7 +106,7 @@ The module is written in compliant with the conventions of PEP8
 
 # :lady_beetle: Reporting Bugs
 
-Teamwork is the key, please report at https://github.com/Zac-not-Zack/Projet-Python/issues if you come across any bug.
+Teamwork is the key, please report at https://github.com/Zac-not-Zack/apache_analyser/issues if you come across any bug.
 
 
 # :warning: Licence

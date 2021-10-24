@@ -4,7 +4,7 @@ Contributors : WONG Hoe Ziet & BIN AZMI Adam
 # Overview
 This is a project of the module "Automatisation of System Administration Tasks" for the course of Diplôme Universitaire Technologie (DUT) Réseaux & Télécommunications.
 
-The main function of the project is to analyse the access log file of an Apache server. The project is consisted of functions that are built to be able to inspect and analyse the data extracted from the log file and provide insights to client notably in the security and commercial point of view. The details and explanation of each the functions can be found below. The project also contains a simple Command Line Interface (CLI) that will facilitate the usage of the functions.
+The main function of the project is to analyse the access log file of an Apache server. The project is consisted of functions that are built to be able to inspect and analyse the data extracted from the log file and provide insights to client notably in the **security and commercial point of view**. The details and explanation of each the functions can be found below. The project also contains a simple Command Line Interface (CLI) that will facilitate the usage of the functions.
 
 # Targetted User
 Our targetted audience is the mainly the user of Apache server, specifically the server adminstrator or development team. This program can also eventually serve as model for other server who uses the same logging format.

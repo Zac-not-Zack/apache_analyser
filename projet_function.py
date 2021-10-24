@@ -298,14 +298,18 @@ my_parser.add_argument('--f', action='store_true', help="voir l'heure creuse du 
 my_parser.add_argument('--g', action='store_true', help="analyser les réponses des requêtes")
 
 #AnalyseIPAdd
-my_parser.add_argument('--h', action='store_true', help="analyser les adresses IP de clients")
+my_parser.add_argument('--i', action='store_true', help="analyser les adresses IP de clients")
 
 #AnalyseTypeDoc
-my_parser.add_argument('--i', action='store_true', help="analyser les 10 types de documents les plus demandés par client")
+my_parser.add_argument('--j', action='store_true', help="analyser les 10 types de documents les plus demandés par client")
 
 #AnalyseBrowser
-my_parser.add_argument('--j', action='store_true', help="analyser le navigateur utilisé par client")
+my_parser.add_argument('--k', action='store_true', help="analyser le navigateur utilisé par client")
 
+__version_info__ = ('1','0','0')
+__version__ = '.'.join(__version_info__)
+
+my_parser.add_argument('-V', '--version', action='version', version="%(prog)s ("+__version__+")")
 args = my_parser.parse_args()
 
 nom_fic = args.filename.name
@@ -342,14 +346,14 @@ if args.g:
     resultat_reponse = count_response(nom_fic)
     print(resultat_reponse)
 
-if args.h:
+if args.i:
     resultat_ip = analyse_ip_addr(nom_fic)
     print(resultat_ip)
 
-if args.i:
+if args.j:
     resultat_type_doc = analyse_doc_type(nom_fic)
     print(resultat_type_doc)
 
-if args.j:
+if args.k:
     resultat_count_browser = count_browser(nom_fic)
     print(resultat_count_browser)
